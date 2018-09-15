@@ -1,0 +1,71 @@
+Solution
+Number of goods: 8
+Total cost: 195054.99996792868
+Transportation cost: 7935.0
+Warehouse cost: 0.0
+Tax cost: 187120.0
+------------------------------------
+Goods-1  Category: Honey
+Start date: 2018-02-01
+Arrival date: 2018-02-16
+Route:
+(1)Date: 2018-02-05  From: Singapore Warehouse  To: Malaysia Warehouse  By: Truck
+(2)Date: 2018-02-06  From: Malaysia Warehouse  To: Malaysia Port  By: Truck
+(3)Date: 2018-02-07  From: Malaysia Port  To: Shanghai Port  By: Sea
+(4)Date: 2018-02-14  From: Shanghai Port  To: Shanghai Warehouse  By: Truck
+(5)Date: 2018-02-15  From: Shanghai Warehouse  To: Wuxi Warehouse  By: Truck
+------------------------------------
+Goods-2  Category: Furniture
+Start date: 2018-02-02
+Arrival date: 2018-02-11
+Route:
+(1)Date: 2018-02-02  From: Malaysia Warehouse  To: Malaysia Port  By: Truck
+(2)Date: 2018-02-03  From: Malaysia Port  To: Shanghai Port  By: Sea
+(3)Date: 2018-02-10  From: Shanghai Port  To: Shanghai Warehouse  By: Truck
+------------------------------------
+Goods-3  Category: Paper plates
+Start date: 2018-02-03
+Arrival date: 2018-02-15
+Route:
+(1)Date: 2018-02-05  From: Singapore Warehouse  To: Malaysia Warehouse  By: Truck
+(2)Date: 2018-02-06  From: Malaysia Warehouse  To: Malaysia Port  By: Truck
+(3)Date: 2018-02-07  From: Malaysia Port  To: Shanghai Port  By: Sea
+(4)Date: 2018-02-14  From: Shanghai Port  To: Shanghai Warehouse  By: Truck
+------------------------------------
+Goods-4  Category: Pharmaceutical drugs
+Start date: 2018-02-04
+Arrival date: 2018-02-15
+Route:
+(1)Date: 2018-02-05  From: Singapore Warehouse  To: Malaysia Warehouse  By: Truck
+(2)Date: 2018-02-06  From: Malaysia Warehouse  To: Malaysia Port  By: Truck
+(3)Date: 2018-02-07  From: Malaysia Port  To: Shanghai Port  By: Sea
+(4)Date: 2018-02-14  From: Shanghai Port  To: Shanghai Warehouse  By: Truck
+------------------------------------
+Goods-5  Category: Cigarette
+Start date: 2018-02-05
+Arrival date: 2018-02-15
+Route:
+(1)Date: 2018-02-05  From: Wuxi Warehouse  To: Shanghai Warehouse  By: Truck
+(2)Date: 2018-02-06  From: Shanghai Warehouse  To: Shanghai Port  By: Truck
+(3)Date: 2018-02-07  From: Shanghai Port  To: Malaysia Port  By: Sea
+(4)Date: 2018-02-14  From: Malaysia Port  To: Malaysia Warehouse  By: Truck
+------------------------------------
+Goods-6  Category: Apple
+Start date: 2018-02-06
+Arrival date: 2018-02-16
+Route:
+(1)Date: 2018-02-06  From: Shanghai Warehouse  To: Shanghai Port  By: Truck
+(2)Date: 2018-02-07  From: Shanghai Port  To: Singapore Port  By: Sea
+(3)Date: 2018-02-15  From: Singapore Port  To: Singapore Warehouse  By: Truck
+------------------------------------
+Goods-7  Category: Durian
+Start date: 2018-02-07
+Arrival date: 2018-02-08
+Route:
+(1)Date: 2018-02-07  From: Malaysia Warehouse  To: Singapore Warehouse  By: Truck
+------------------------------------
+Goods-8  Category: Furniture
+Start date: 2018-02-08
+Arrival date: 2018-02-09
+Route:
+(1)Date: 2018-02-08  From: Wuxi Warehouse  To: Shanghai Warehouse  By: Truck
