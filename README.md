@@ -6,7 +6,7 @@ In delivery services, many different transportation tools such as trucks, airpla
 <p align="center"><img src="https://user-images.githubusercontent.com/30411828/45585955-c6311e80-b920-11e8-95c9-bc90089446b4.jpg"></p>
 
 ## Assumptions
-Before model building, some assumptions should be made to simplify the case because real-world delivery problems consist of too many unmeasurable factors that can affect the delivery process and final outcomes. Here are the assumptions:<br>
+Before model building, some assumptions should be made to simplify the case because real-world delivery problems consist of too many unmeasurable factors that can affect the delivery process and final outcomes. Here are the main assumptions:<br>
 1. The delivery process is **deterministic**, no random effect will appear on delivery time and cost etc. 
 2. Goods can be transported in **normal container**, no special containers (refrigerated, thermostatic etc.) will be needed.
 3. Container only constraints on the good's **volume**, and all goods are **divisible in terms of volume**. (No bin packing problem needed to be considered.) 
