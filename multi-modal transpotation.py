@@ -26,6 +26,7 @@ class MMT(Model):
         self.maxDate = None
         self.minDate = None
         self.tranCost = None
+        self.tranFixedCost = None
         self.tranTime = None
         self.ctnVol = None
         self.whCost = None
@@ -36,15 +37,22 @@ class MMT(Model):
         self.kEndPort = None
         self.kStartTime = None
         self.taxPct = None
+        self.transitDuty = None
         #decision variables
         self.var = None
         self.x = None
         self.var_2 = None
         self.y = None
+        self.var_3 = None
+        self.z = None
         #result & solution
         self.xs = None
         self.ys = None
+        self.zs = None
         self.whCostFinal = None
+        self.transportCost = None
+        self.taxCost = None
+        self.timeTrick = None
         self.solution_ = None
         self.arrTime_ = None
         
@@ -80,11 +88,16 @@ class MMT(Model):
         
         self.goods = order.shape[0]
         self.tranCost = np.ones([self.portSpace,self.portSpace,self.dateSpace])*bigM
+        self.tranFixedCost = np.ones([self.portSpace,self.portSpace,self.dateSpace])*bigM
         self.tranTime = np.ones([self.portSpace,self.portSpace,self.dateSpace])*bigM
         
         for i in range(route.shape[0]):
             self.tranCost[source[i],destination[i],DateList[i]] = route['Cost'][i]
+            self.tranFixedCost[source[i],destination[i],DateList[i]] = route['Fixed Freight Cost'][i]
             self.tranTime[source[i],destination[i],DateList[i]] = route['Time'][i]
+        
+        self.transitDuty = np.ones([self.portSpace,self.portSpace])*bigM
+        self.transitDuty[source,destination] = route['Transit Duty']
         
         #make the container size of infeasible routes to be small enough, similar to bigM
         self.ctnVol = np.ones([self.portSpace,self.portSpace])*0.1
@@ -106,18 +119,23 @@ class MMT(Model):
         '''build up the mathematical programming model's objective and constraints.'''
         
         # 4 dimensional binary decision variable matrix 
-        self.var = self.binary_var_list(self.portSpace*self.portSpace*self.dateSpace*self.goods,name='z')
+        self.var = self.binary_var_list(self.portSpace*self.portSpace*self.dateSpace*self.goods,name='x')
         self.x = np.array(self.var).reshape(self.portSpace,self.portSpace,self.dateSpace,self.goods)
         # 3 dimensional container number matrix
         self.var_2 = self.integer_var_list(self.portSpace*self.portSpace*self.dateSpace,name='y')
         self.y = np.array(self.var_2).reshape(self.portSpace,self.portSpace,self.dateSpace)
+        # 3 dimensional route usage matrix
+        self.var_3 = self.binary_var_list(self.portSpace*self.portSpace*self.dateSpace,name='z')
+        self.z = np.array(self.var_3).reshape(self.portSpace,self.portSpace,self.dateSpace)        
         #warehouse related cost
         warehouseCost,arrTime,stayTime = self.warehouse_fee(self.x)
         #time trick used to perform time minimization as second objective
         timeTrick = 10e-5 * np.sum(arrTime[:,self.kEndPort,:,range(self.goods)])
         ###objective###
-        self.minimize(np.sum(self.y*self.tranCost)+warehouseCost
-                      +np.sum(self.taxPct*self.kValue)+timeTrick)
+        transportCost = np.sum(self.y*self.tranCost) + np.sum(self.z*self.tranFixedCost)
+        transitDutyCost =  np.sum(np.sum(np.dot(self.x,self.kValue),axis=2)*self.transitDuty)
+        taxCost = np.sum(self.taxPct*self.kValue) + transitDutyCost
+        self.minimize(transportCost + warehouseCost + taxCost + timeTrick)
         ###constraint###
         #1.constraint for start & end
         self.add_constraints(np.sum(self.x[self.kStartPort[k],:,:,k]) == 1 for k in range(self.goods))
@@ -138,9 +156,12 @@ class MMT(Model):
         numCtn = np.dot(self.x,self.kVol)/self.ctnVol
         self.add_constraints(self.y[i,j,t] - numCtn[i,j,t] >= 0 \
         for i in range(self.portSpace) for j in range(self.portSpace) for t in range(self.dateSpace))
-        #6.time limitation constraint for each goods
+        #6. constraint to check whether a route is used
+        self.add_constraints(self.z[i,j,t] >= (np.sum(self.x[i,j,t,:])/self.goods) \
+        for i in range(self.portSpace) for j in range(self.portSpace) for t in range(self.dateSpace))
+        #7.time limitation constraint for each goods
         self.add_constraints(np.sum(arrTime[:,self.kEndPort[k],:,k]) <= self.kDDL[k] for k in range(self.goods))
-        #7.start time limitation constraint for each goods
+        #8.start time limitation constraint for each goods
         for k in range(self.goods):
             if self.kStartTime[k] > 0:
                 self.add_constraint(np.sum(self.x[self.kStartPort[k],:,0:self.kStartTime[k],k]) == 0)
@@ -154,6 +175,7 @@ class MMT(Model):
             ms = self.solve()
             self.xs = np.array(ms.get_values(self.var)).reshape(self.portSpace,self.portSpace,self.dateSpace,self.goods)
             self.ys = np.array(ms.get_values(self.var_2)).reshape(self.portSpace,self.portSpace,self.dateSpace)
+            self.zs = np.array(ms.get_values(self.var_3)).reshape(self.portSpace,self.portSpace,self.dateSpace)
             nonzeroX = list(zip(*np.nonzero(self.xs)))
             nonzeroX = sorted(nonzeroX, key = lambda x:x[2])
             nonzeroX = sorted(nonzeroX, key = lambda x:x[3])
@@ -162,7 +184,9 @@ class MMT(Model):
     
             self.whCostFinal, arrTime, _ = self.warehouse_fee(self.xs)
             self.timeTrick = 10e-5*np.sum(arrTime[:,self.kEndPort,:,range(self.goods)])
-            
+            self.transportCost = np.sum(self.ys*self.tranCost) + np.sum(self.zs*self.tranFixedCost)
+            self.taxCost = np.sum(self.taxPct*self.kValue) + \
+                           np.sum(np.sum(np.dot(self.xs,self.kValue),axis=2)*self.transitDuty)
             self.solution_ = {}
             self.arrTime_ = {}
             for i in range(self.goods):
@@ -186,12 +210,10 @@ class MMT(Model):
         startTime = np.arange(self.dateSpace).reshape(1,1,self.dateSpace,1)*x            
         arrTimeMtrx = startTime + self.tranTime.reshape(self.portSpace,\
                     self.portSpace,self.dateSpace,1)*x
-        arrTime = arrTimeMtrx.copy()
-        for k in range(self.goods):
-            startTime[self.kStartPort[k],:,:,k] = 0            
-        for k in range(self.goods):
-            arrTimeMtrx[:,self.kEndPort[k],:,k] = 0    
+        arrTime = arrTimeMtrx.copy()        
+        arrTimeMtrx[:,self.kEndPort,:,range(self.goods)] = 0    
         stayTime = np.sum(startTime,axis=(1,2)) - np.sum(arrTimeMtrx,axis=(0,2))
+        stayTime[self.kStartPort,range(self.goods)] -= self.kStartTime
         warehouseCost = np.sum(np.sum(stayTime*self.kVol,axis=1)*self.whCost)
         
         return warehouseCost, arrTime, stayTime
@@ -203,10 +225,10 @@ class MMT(Model):
         travelMode = dict(zip(zip(route['Source'],route['Destination']),route['Travel Mode']))
         txt = "Solution"
         txt += "\nNumber of goods: " + str(order['Order Number'].count())
-        txt += "\nTotal cost: " + str(self.objective_value - self.timeTrick) 
-        txt += "\nTransportation cost: " + str(np.sum(self.ys*self.tranCost))
+        txt += "\nTotal cost: " + str(self.transportCost+self.whCostFinal+self.taxCost) 
+        txt += "\nTransportation cost: " + str(self.transportCost)
         txt += "\nWarehouse cost: " + str(self.whCostFinal)
-        txt += "\nTax cost: " + str(np.sum(self.taxPct*self.kValue))
+        txt += "\nTax cost: " + str(self.taxCost)
         
         for i in range(order.shape[0]):
             txt += "\n------------------------------------"
@@ -232,14 +254,15 @@ class MMT(Model):
 def transform(filePath):
     '''Read in order and route data, transform the data into a form that can
     be processed by the operation research model.'''
-    
+
     order = pd.read_excel(filePath,sheetname='Order Information')
     route = pd.read_excel(filePath,sheetname='Route Information')
-    route['Cost'] = route[route.columns[6:12]].sum(axis=1)
-    route['Time'] = np.ceil(route[route.columns[13:17]].sum(axis=1)/24)
-    route = route[list(route.columns[0:4]) + ['Time','Cost','Warehouse Cost','Travel Mode']\
-                  + list(route.columns[17:24])]
-    route = pd.melt(route, id_vars=route.columns[0:8], value_vars=route.columns[-7:]\
+    order['Tax Percentage'][order['Journey Type'] == 'Domestic'] = 0
+    route['Cost'] = route[route.columns[7:12]].sum(axis=1)
+    route['Time'] = np.ceil(route[route.columns[14:18]].sum(axis=1)/24)
+    route = route[list(route.columns[0:4]) + ['Fixed Freight Cost','Time',\
+            'Cost','Warehouse Cost','Travel Mode','Transit Duty'] + list(route.columns[-9:-2])]
+    route = pd.melt(route, id_vars=route.columns[0:10], value_vars=route.columns[-7:]\
                     ,var_name='Weekday',value_name='Feasibility')
     route['Weekday'] = route['Weekday'].replace({'Monday':1,'Tuesday':2,'Wednesday':3,\
          'Thursday':4,'Friday':5,'Saturday':6,'Sunday':7})
