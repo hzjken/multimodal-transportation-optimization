@@ -1,4 +1,4 @@
-# multimodal-transportation-optimization
+# Multi-modal Transportation Optimization
 A project on using mathematical programming to solve multi-modal transportation cost minimization in goods delivery and supply chain management.
 ## Project Overview
 In delivery services, many different transportation tools such as trucks, airplanes and ships are available. Different choices of routes and transporation tools will lead to different costs. To minimize cost, we should consider goods consolidation (Occassions when different goods share a journey together.), different transportation costs and delivery time constraints etc. This project uses mathematical programming to model such situation and solves for cost minimization solution. The model is implemented with **IBM Cplex API** and **numpy** matrixing in Python.
@@ -40,6 +40,7 @@ A variable matrix used to support the decision variable matrix. It's a 3 dimensi
 ## Parameters
 Similar to the decision variables mentioned above, the following parameters or parameter matrices are introduced for the sake of later model building:<br>
 1. **Transportation Cost: C<sub>i,j,t</sub>**
+2. **Transportation Time: T<sub>i,j,t</sub>**
 
 ## Mathematical Modelling
 
