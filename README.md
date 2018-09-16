@@ -15,7 +15,9 @@ Before model building, some assumptions should be made to simplify the case beca
 6. Overall cost is restricted to the most important 3 parts, **transportation cost**, **warehouse cost** and **goods tariff**.
 
 ## Parameters
-
+To build up the objectives and constraints of the optimization model, the following parameters are introduced:<br>
+**1. Transportation Cost: C<sub>i,j,t</sub>**
+#### **1. Transportation Cost: C<sub>i,j,t</sub>**
 ## Decision Variables
 
 ## Mathematical Modelling
