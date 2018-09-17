@@ -5,6 +5,10 @@ In delivery services, many different transportation tools such as trucks, airpla
 
 <p align="center"><img src="https://user-images.githubusercontent.com/30411828/45585955-c6311e80-b920-11e8-95c9-bc90089446b4.jpg"></p>
 
+In our simulated case, there are 8 goods, 4 cities/countries (Shanghai, Wuxi, Singapore, Malaysia), 16 ports and 4 transportation tools. The 8 goods originate from different cities and have different destinations. Each city/country has 4 ports, the airport, railway station, seaport and warehouse. There are some routes connecting different ports. Each route has a specific transportation tool, transportation cost, transit time and weekly schedule. The model we build will give out the best route for every goods that leads to the minimum overall cost in such simulated case.
+
+<p align="center"><img  height="350" src="https://user-images.githubusercontent.com/30411828/45628501-d125b380-bac6-11e8-8bd8-b909ac2a257e.png"></p>
+
 ## Assumptions
 Before model building, some assumptions should be made to simplify the case because real-world delivery problems consist of too many unmeasurable factors that can affect the delivery process and final outcomes. Here are the main assumptions:<br>
 1. The delivery process is **deterministic**, no random effect will appear on delivery time and cost etc. 
@@ -13,6 +17,7 @@ Before model building, some assumptions should be made to simplify the case beca
 4. The model only evaluates the **major carriage routes**. The first and last mile between end user and origin/destination shipping point are not considered. (**From warehouse to warehouse**.)
 5. There is **only one transportation tool available between each two ports**. For instance, we can only directly go from one airport to the other airport in different cities by flight, while direct journey by ship or railway or truck is infeasible.
 6. Overall cost is restricted to the most important 3 parts, **transportation cost**, **warehouse cost** and **goods tariff**.
+7. The minimum unit for time is **day** in the model, and there is **at most one transit in a route in one day**. 
 
 ## Decision Variables
 In order to fit such problem into the framework of mathematical programming and simplify the later model building part, we need to use the concept of **variable matrix**, a list of variables deployed in the form of a matrix or multi-dimensional array. In our modelling, 3 variable matrices will be introduced.<br>
@@ -46,10 +51,10 @@ A 3 dimensional parameter matrix, each dimension representing start port, end po
 A 3 dimensional parameter matrix, each dimension representing start port, end port and time. ***FC<sub>i,j,t</sub>*** in the matrix represents the fixed transportation cost to travel from **port i** to **port j** at **time t**, regardless of goods number or volume. For infeasible route, the cost element will be set to be big M as well.
 
 3. **Warehouse Cost:** &nbsp;&nbsp; ***wh***<br>
-A one dimension array with length equaling the number of ports in the data. ***wh<sub>i</sub>*** represents the warehouse cost per cubic meter per day at **port i**. Warehouse cost for ports with no warehouse function (like airport, railway station etc.) is set to be big M.
+A one dimension array with length equaling the total number of ports. ***wh<sub>i</sub>*** represents the warehouse cost per cubic meter per day at **port i**. Warehouse cost for ports with no warehouse function (like airport, railway station etc.) is set to be big M.
 
 4. **Transportation Time:** &nbsp;&nbsp; ***T***<br>
-A 3 dimensional parameter matrix, each dimension representing start port, end port and time. ***T<sub>i,j,t</sub>*** in the matrix represents the overall transportation time from **port i** to **port j** at **time t**. This overall time includes custom clearance time, handling time, transit time and extra time from **model data.xlsx**. For infeasible route, the time element will be set to be big M as well.
+A 3 dimensional parameter matrix, each dimension representing start port, end port and time. ***T<sub>i,j,t</sub>*** in the matrix represents the overall transportation time from **port i** to **port j** at **time t**. This overall time includes custom clearance time, handling time, transit time and extra time from **model data.xlsx**. For infeasible route, the time element will be set to be big M.
 
 ## Mathematical Modelling
 
