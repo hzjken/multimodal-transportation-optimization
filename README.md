@@ -16,22 +16,22 @@ Before model building, some assumptions should be made to simplify the case beca
 
 ## Decision Variables
 In order to fit such problem into the framework of mathematical programming and simplify the later model building part, we need to use the concept of **variable matrix**, a list of variables deployed in the form of a matrix or multi-dimensional array. In our modelling, 3 variable matrices will be introduced.<br>
-1. **Decision Variable Matrix:**  ***X***<br>
+1. **Decision Variable Matrix:** &nbsp;&nbsp; ***X***<br>
 The most important variable matrix in the model. It's a 4 dimensional matrix, each dimension representing start port, end port, time and goods respectively. Each element in the matrix is a binary variable, representing whether a route is taken by a specific goods. For example, element ***X<sub>i,j,t,k</sub>*** represents whether **goods k** travels from **port i** to **port j** at **time t**.
 ```python
   varList1 = model.binary_var_list(portDim * portDim * timeDim * goodsDim,name = 'x')
   x = np.array(varList1).reshape(portDim, portDim, timeDim, goodsDim)
 ```
 
-2. **Container Number Matrix:**  ***Y***<br>
+2. **Container Number Matrix:** &nbsp;&nbsp; ***Y***<br>
 A variable matrix used to support the decision variable matrix. It's a 3 dimensional matrix, with each dimension representing start port, end port and time respectively. Each element in the matrix is an integer variable, representing the number of containers needed in a specific route. For example, ***Y<sub>i,j,t</sub>*** represents the number of containers needed to load all the goods travelling simultaneously from **port i** to **port j** at **time t**. Such matrix is introduced to make up for the limitation of "linear operator only" in mathematical programming, when we need a **roundup()** method in direct calculation of the container number.
 ```python
   varList2 = model.integer_var_list(portDim * portDim * timeDim,name = 'y')
   y = np.array(varList2).reshape(portDim, portDim, timeDim)
   ```
 
-3. **Route Usage Matrix:** ***Z***<br>
-A variable matrix used to support the decision variable matrix. It's a 3 dimensional matrix, with each dimension representing start port, end port and time respectively. Each element in the matrix is a binary variable, representing whether a route is used or not. For instance, ***Z<sub>i,j,t</sub>*** represents whether the route from **port i** to **port j** at **time t** is used or not (no matter which goods). It's introduced with similar purpose to ***Y<sub>i,j,t</sub>***.
+3. **Route Usage Matrix:** &nbsp;&nbsp; ***Z***<br>
+A variable matrix used to support the decision variable matrix. It's a 3 dimensional matrix, with each dimension representing start port, end port and time respectively. Each element in the matrix is a binary variable, representing whether a route is used or not. For instance, ***Z<sub>i,j,t</sub>*** represents whether the route from **port i** to **port j** at **time t** is used or not (no matter which goods). It's introduced with similar purpose to ***Y<sub>i,j,t</sub>*** .
 ```python
   varList3 = model.binary_var_list(portDim * portDim * timeDim,name = 'z')
   z = np.array(varList3).reshape(portDim, portDim, timeDim)        
@@ -39,16 +39,16 @@ A variable matrix used to support the decision variable matrix. It's a 3 dimensi
 
 ## Parameters
 Similar to the decision variables mentioned above, the following parameters or parameter matrices are introduced for the sake of later model building:<br>
-1. **Per Container Cost:** ***C***<br>
+1. **Per Container Cost:** &nbsp;&nbsp; ***C***<br>
 A 3 dimensional parameter matrix, each dimension representing start port, end port and time. ***C<sub>i,j,t</sub>*** in the matrix represents the overall transportation cost per container from **port i** to **port j** at **time t**. This overall cost includes handling cost, bunker/fuel cost, documentation cost, equipment cost and extra cost from **model data.xlsx**. For infeasible route, the cost element will be set to be big M (an extremely large number), making the choice infeasible.
 
-2. **Route Fixed Cost:** ***FC***<br>
+2. **Route Fixed Cost:** &nbsp;&nbsp; ***FC***<br>
 A 3 dimensional parameter matrix, each dimension representing start port, end port and time. ***FC<sub>i,j,t</sub>*** in the matrix represents the fixed transportation cost to travel from **port i** to **port j** at **time t**, regardless of goods number or volume. For infeasible route, the cost element will be set to be big M as well.
 
-3. **Warehouse Cost:** ***wh***<br>
+3. **Warehouse Cost:** &nbsp;&nbsp; ***wh***<br>
 A one dimension array with length equaling the number of ports in the data. ***wh<sub>i</sub>*** represents the warehouse cost per cubic meter per day at **port i**. Warehouse cost for ports with no warehouse function (like airport, railway station etc.) is set to be big M.
 
-4. **Transportation Time:** ***T***<br>
+4. **Transportation Time:** &nbsp;&nbsp; ***T***<br>
 A 3 dimensional parameter matrix, each dimension representing start port, end port and time. ***T<sub>i,j,t</sub>*** in the matrix represents the overall transportation time from **port i** to **port j** at **time t**. This overall time includes custom clearance time, handling time, transit time and extra time from **model data.xlsx**. For infeasible route, the time element will be set to be big M as well.
 
 ## Mathematical Modelling
