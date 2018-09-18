@@ -20,8 +20,20 @@ Before model building, some assumptions should be made to simplify the case beca
 6. Overall cost is restricted to the most important 3 parts, **transportation cost**, **warehouse cost** and **goods tariff**.
 7. The minimum unit for time is **day** in the model, and there is **at most one transit in a route in one day**. 
 
+## Dimension & Matrixing
+In order to make the criteria logic to be more clear and the calculation to be more efficient, we use the concept of matrixing to build the necessary components (decision variables, parameters and constraints) in the model. In our case, there are totally 4 dimensions:<br>
+1. **Start Port:** &nbsp;&nbsp; ***i***<br>
+Indicating the start port of a direct transport route. The dimension length equals the total number of ports in the data.
+2. **End Port:** &nbsp;&nbsp; ***j***<br>
+Indicating the end port of a direct transport route. The dimension length equals the total number of ports in the data.
+1. **Time:** &nbsp;&nbsp; ***t***<br>
+Indicating the departure time of a direct transport. The dimension length equals the total number of days between the earliest order date and the latest delivery deadline date of all goods in the data.
+1. **Goods:** &nbsp;&nbsp; ***k***<br>
+Indicating the goods to be transported. The dimension length equals the total number of goods in the data.
+
+All the variable or parameter matrices to be introduced in the later parts will have one or more of these 4 dimensions.
 ## Decision Variables
-In order to fit such problem into the framework of mathematical programming and simplify the later model building part, we need to use the concept of **variable matrix**, a list of variables deployed in the form of a matrix or multi-dimensional array. In our modelling, 3 variable matrices will be introduced.<br>
+As mentioned above, we will use the concept of **variable matrix**, a list of variables deployed in the form of a matrix or multi-dimensional array. In our model, 3 variable matrices will be introduced:<br>
 1. **Decision Variable Matrix:** &nbsp;&nbsp; ***X***<br>
 The most important variable matrix in the model. It's a 4 dimensional matrix, each dimension representing start port, end port, time and goods respectively. Each element in the matrix is a binary variable, representing whether a route is taken by a specific goods. For example, element ***X<sub>i,j,t,k</sub>*** represents whether **goods k** travels from **port i** to **port j** at **time t**.
 ```python
@@ -44,7 +56,8 @@ A variable matrix used to support the decision variable matrix. It's a 3 dimensi
 ```
 
 ## Parameters
-Similar to the decision variables mentioned above, the following parameters or parameter matrices are introduced for the sake of later model building:<br>
+Similar to the decision variables, the following parameter arrays or matrices are introduced for the sake of later model building:<br>
+
 1. **Per Container Cost:** &nbsp;&nbsp; ***C***<br>
 A 3 dimensional parameter matrix, each dimension representing start port, end port and time. ***C<sub>i,j,t</sub>*** in the matrix represents the overall transportation cost per container from **port i** to **port j** at **time t**. This overall cost includes handling cost, bunker/fuel cost, documentation cost, equipment cost and extra cost from **model data.xlsx**. For infeasible route, the cost element will be set to be big M (an extremely large number), making the choice infeasible.
 
@@ -52,13 +65,13 @@ A 3 dimensional parameter matrix, each dimension representing start port, end po
 A 3 dimensional parameter matrix, each dimension representing start port, end port and time. ***FC<sub>i,j,t</sub>*** in the matrix represents the fixed transportation cost to travel from **port i** to **port j** at **time t**, regardless of goods number or volume. For infeasible route, the cost element will be set to be big M as well.
 
 3. **Warehouse Cost:** &nbsp;&nbsp; ***wh***<br>
-A one dimension array with length equaling the total number of ports. ***wh<sub>i</sub>*** represents the warehouse cost per cubic meter per day at **port i**. Warehouse cost for ports with no warehouse function (like airport, railway station etc.) is set to be big M.
+A one dimension array with dimension start port. ***wh<sub>i</sub>*** represents the warehouse cost per cubic meter per day at **port i**. Warehouse cost for ports with no warehouse function (like airport, railway station etc.) is set to be big M.
  
 4. **Transportation Time:** &nbsp;&nbsp; ***T***<br>
 A 3 dimensional parameter matrix, each dimension representing start port, end port and time. ***T<sub>i,j,t</sub>*** in the matrix represents the overall transportation time from **port i** to **port j** at **time t**. This overall time includes custom clearance time, handling time, transit time and extra time from **model data.xlsx**. For infeasible route, the time element will be set to be big M.
 
 5. **Tax Percentage:** &nbsp;&nbsp; ***tax***<br>
-A one dimension array with length euqaling the total number of goods. ***tax<sub>k</sub>*** represents the tax percentage for **goods k** imposed by its destination country. If the goods only goes through a domestic transit, the tax percentage for such goods will be set as 0.
+A one dimension array with dimension goods. ***tax<sub>k</sub>*** represents the tax percentage for **goods k** imposed by its destination country. If the goods only goes through a domestic transit, the tax percentage for such goods will be set as 0.
 
 6. **Transit Duty:** &nbsp;&nbsp; ***td***<br>
 A two dimensional matrix, each dimension representing start port and end port. ***td<sub>i,j</sub>*** represents the transit duty percentage for goods to go from **port i** to **port j**. If port i and port j belong to the same country, transit duty percentage is set to be 0. For simplicity purpose, transit duty is set to be equal among all goods. (can be extended easily) 
@@ -67,22 +80,24 @@ A two dimensional matrix, each dimension representing start port and end port. *
 A two dimensional matrix, each dimension representing start port and end port. ***ctnV<sub>i,j</sub>*** represents the volume of container in the route from **port i** to **port j**.
 
 8. **Goods Volume:** &nbsp;&nbsp; ***V***<br>
-A one dimension array with length equaling the total number of goods. ***V<sub>k</sub>*** represents the volume of **goods k**.
+A one dimension array with dimension goods. ***V<sub>k</sub>*** represents the volume of **goods k**.
 
 9. **Goods Value:** &nbsp;&nbsp; ***val***<br>
-A one dimension array with length equaling the total number of goods. ***val<sub>k</sub>*** represents the value of **goods k**.
+A one dimension array with dimension goods. ***val<sub>k</sub>*** represents the value of **goods k**.
 
 10. **Order Date:** &nbsp;&nbsp; ***ord***<br>
-A one dimension array with length equaling the total number of goods. ***ord<sub>k</sub>*** represents the order date of **goods k**.
+A one dimension array with dimension goods. ***ord<sub>k</sub>*** represents the order date of **goods k**.
 
 11. **Deadline Date:** &nbsp;&nbsp; ***ddl***<br>
-A one dimension array with length equaling the total number of goods. ***ddl<sub>k</sub>*** represents the deadline delivery date of **goods k**.
+A one dimension array with dimension goods. ***ddl<sub>k</sub>*** represents the deadline delivery date of **goods k**.
 
 12. **Origin Port:** &nbsp;&nbsp; ***OP***<br>
-A one dimension array with length equaling the total number of goods. ***OP<sub>k</sub>*** represents the port where **goods k** starts from.
+A one dimension array with dimension goods. ***OP<sub>k</sub>*** represents the port where **goods k** starts from.
 
 13. **Destination Port:** &nbsp;&nbsp; ***DP***<br>
-A one dimension array with length equaling the total number of goods. ***DP<sub>k</sub>*** represents the port where **goods k** ends up to be in.
+A one dimension array with dimension goods. ***DP<sub>k</sub>*** represents the port where **goods k** ends up to be in.
+
+The data of all the above parameter matrices will be imported from **model data.xlsx** with function **transform()** and **set_param()**. Please refer to the codes for more details.
 
 ## Mathematical Modelling
 
