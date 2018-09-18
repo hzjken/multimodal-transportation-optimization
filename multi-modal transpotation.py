@@ -52,7 +52,6 @@ class MMT(Model):
         self.whCostFinal = None
         self.transportCost = None
         self.taxCost = None
-        self.timeTrick = None
         self.solution_ = None
         self.arrTime_ = None
         
@@ -129,13 +128,11 @@ class MMT(Model):
         self.z = np.array(self.var_3).reshape(self.portSpace,self.portSpace,self.dateSpace)        
         #warehouse related cost
         warehouseCost,arrTime,stayTime = self.warehouse_fee(self.x)
-        #time trick used to perform time minimization as second objective
-        timeTrick = 10e-5 * np.sum(arrTime[:,self.kEndPort,:,range(self.goods)])
         ###objective###
         transportCost = np.sum(self.y*self.tranCost) + np.sum(self.z*self.tranFixedCost)
         transitDutyCost =  np.sum(np.sum(np.dot(self.x,self.kValue),axis=2)*self.transitDuty)
         taxCost = np.sum(self.taxPct*self.kValue) + transitDutyCost
-        self.minimize(transportCost + warehouseCost + taxCost + timeTrick)
+        self.minimize(transportCost + warehouseCost + taxCost)
         ###constraint###
         #1.constraint for start & end
         self.add_constraints(np.sum(self.x[self.kStartPort[k],:,:,k]) == 1 for k in range(self.goods))
@@ -183,7 +180,6 @@ class MMT(Model):
             (self.minDate + pd.to_timedelta(x[2],unit='days')).date().isoformat(),x[3]),nonzeroX))
     
             self.whCostFinal, arrTime, _ = self.warehouse_fee(self.xs)
-            self.timeTrick = 10e-5*np.sum(arrTime[:,self.kEndPort,:,range(self.goods)])
             self.transportCost = np.sum(self.ys*self.tranCost) + np.sum(self.zs*self.tranFixedCost)
             self.taxCost = np.sum(self.taxPct*self.kValue) + \
                            np.sum(np.sum(np.dot(self.xs,self.kValue),axis=2)*self.transitDuty)
