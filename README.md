@@ -102,8 +102,9 @@ The data of all the above parameter matrices will be imported from **model data.
 ## Mathematical Modelling
 With all the variables and parameters defined above, we can build up the objectives and constraints to form an integer programming model.
 ### Objective
-<p align="center"><img c="https://user-images.githubusercontent.com/30411828/45684337-8e241880-bb78-11e8-84fd-70fc3cbd20f2.png""></p>
-  
+<p align="center"><img width ="500" src="https://user-images.githubusercontent.com/30411828/45684337-8e241880-bb78-11e8-84fd-70fc3cbd20f2.png"></p>
+<p align="center"><img width ="600" src="https://user-images.githubusercontent.com/30411828/45684632-82852180-bb79-11e8-8fd9-547623e9ab66.png"></p>
+
 ## Optimization Result & Solution
 
 ## Model Use & Extension Guide
