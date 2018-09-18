@@ -6,9 +6,10 @@ In delivery services, many different transportation tools such as trucks, airpla
 <p align="center"><img src="https://user-images.githubusercontent.com/30411828/45585955-c6311e80-b920-11e8-95c9-bc90089446b4.jpg"></p>
 
 ## Problem Statement
-In our simulated case, there are 8 goods, 4 cities/countries (Shanghai, Wuxi, Singapore, Malaysia), 16 ports and 4 transportation tools. The 8 goods originate from different cities and have different destinations. Each city/country has 4 ports, the airport, railway station, seaport and warehouse. There are in total 50 routes connecting different ports. Each route has a specific transportation tool, transportation cost, transit time and weekly schedule. Warehouse in each city allows goods to be deposited for a period of time so as to fit certain transportation schedules or wait for other goods to be transported together. All goods might have different order dates and different delivery deadlines. With all these criteria, how can we find out solution routes for all goods that minimize the overall cost? 
+In our simulated case, there are 8 goods, 4 cities/countries (Shanghai, Wuxi, Singapore, Malaysia), 16 ports and 4 transportation tools. The 8 goods originate from different cities and have different destinations. Each city/country has 4 ports, the airport, railway station, seaport and warehouse. There are in total 50 direct routes connecting different ports. Each route has a specific transportation tool, transportation cost, transit time and weekly schedule. Warehouse in each city allows goods to be deposited for a period of time so as to fit certain transportation schedules or wait for other goods to be transported together. All goods might have different order dates and different delivery deadlines. With all these criteria, how can we find out solution routes for all goods that minimize the overall cost? 
 
-<p align="center"><img  height="350" src="https://user-images.githubusercontent.com/30411828/45628501-d125b380-bac6-11e8-8bd8-b909ac2a257e.png"></p>
+<p align="center"><img  height="320" src="https://user-images.githubusercontent.com/30411828/45705624-a44bcc00-bbac-11e8-8548-d8181d9fd848.png"></p>
+<p align="center">(The above diagram is only used to show the basic idea of the problem, the routes are not complete.)</p>
 
 ## Assumptions
 Before model building, some assumptions should be made to simplify the case because real-world delivery problems consist of too many unmeasurable factors that can affect the delivery process and final outcomes. Here are the main assumptions:<br>
