@@ -102,8 +102,18 @@ The data of all the above parameter matrices will be imported from **model data.
 ## Mathematical Modelling
 With all the variables and parameters defined above, we can build up the objectives and constraints to form an integer programming model.
 ### Objective
-<p align="center"><img width ="500" src="https://user-images.githubusercontent.com/30411828/45684337-8e241880-bb78-11e8-84fd-70fc3cbd20f2.png"></p>
+<p align="center"><img width ="500" src="https://user-images.githubusercontent.com/30411828/45684896-56b66b80-bb7a-11e8-8d6b-0da2d9ec709e.png"></p>
 <p align="center"><img width ="600" src="https://user-images.githubusercontent.com/30411828/45684632-82852180-bb79-11e8-8fd9-547623e9ab66.png"></p>
+
+The objective of the model is to minimize the overall cost, which includes 3 parts, **transportation cost**, **warehouse cost** and **tax cost**. Firstly, the **transportation cost** includes container cost and route fixed cost. Container cost equals the number of containers used in each route times per container cost while route fixed cost equals the sum of fixed cost of all used routes. Secondly, the **warehouse cost** equals all goods' sum of volume times days of storage times warehouse fee per cubic meter per day in each warehouse. Finally, the **tax cost** equals the sum of import tariff and transit duty of all goods.
+```python
+transportCost = np.sum(y*perCtnCost) + np.sum(z*tranFixedCost)
+warehouseCost = warehouse_fee(x)[0] #For details ,pleas refer to function warehouse_fee() in code.
+taxCost = np.sum(taxPct*kValue) + np.sum(np.sum(np.dot(x,kValue),axis=2)*transitDuty)
+model.minimize(transportCost + warehouseCost + taxCost)
+```
+### Constraints
+
 
 ## Optimization Result & Solution
 
