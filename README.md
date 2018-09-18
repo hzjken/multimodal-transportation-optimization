@@ -74,7 +74,7 @@ A 3 dimensional parameter matrix, each dimension representing start port, end po
 A one dimension array with dimension goods. ***tax<sub>k</sub>*** represents the tax percentage for **goods k** imposed by its destination country. If the goods only goes through a domestic transit, the tax percentage for such goods will be set as 0.
 
 6. **Transit Duty:** &nbsp;&nbsp; ***td***<br>
-A two dimensional matrix, each dimension representing start port and end port. ***td<sub>i,j</sub>*** represents the transit duty percentage for goods to go from **port i** to **port j**. If port i and port j belong to the same country, transit duty percentage is set to be 0. For simplicity purpose, transit duty is set to be equal among all goods. (can be extended easily) 
+A two dimensional matrix, each dimension representing start port and end port. ***td<sub>i,j</sub>*** represents the transit duty (tax imposed on goods passing through a country) percentage for goods to go from **port i** to **port j**. If port i and port j belong to the same country, transit duty percentage is set to be 0. For simplicity purpose, transit duty is set to be equal among all goods. (can be extended easily) 
 
 7. **Container Volume:** &nbsp;&nbsp; ***ctnV***<br>
 A two dimensional matrix, each dimension representing start port and end port. ***ctnV<sub>i,j</sub>*** represents the volume of container in the route from **port i** to **port j**.
@@ -100,7 +100,10 @@ A one dimension array with dimension goods. ***DP<sub>k</sub>*** represents the 
 The data of all the above parameter matrices will be imported from **model data.xlsx** with function **transform()** and **set_param()**. For more details, please refer to the codes in [**multi-modal transpotation.py**](https://github.com/hzjken/multimodal-transportation-optimization/blob/master/multi-modal%20transpotation.py).
 
 ## Mathematical Modelling
-
+With all the variables and parameters defined above, we can build up the objectives and constraints to form an integer programming model.
+### Objective
+<p align="center"><img c="https://user-images.githubusercontent.com/30411828/45684337-8e241880-bb78-11e8-84fd-70fc3cbd20f2.png""></p>
+  
 ## Optimization Result & Solution
 
 ## Model Use & Extension Guide
