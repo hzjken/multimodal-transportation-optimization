@@ -6,7 +6,7 @@ In delivery services, many different transportation tools such as trucks, airpla
 <p align="center"><img src="https://user-images.githubusercontent.com/30411828/45585955-c6311e80-b920-11e8-95c9-bc90089446b4.jpg"></p>
 
 ## Problem Statement
-In our simulated case, there are 8 goods, 4 cities/countries (Shanghai, Wuxi, Singapore, Malaysia), 16 ports and 4 transportation tools. The 8 goods originate from different cities and have different destinations. Each city/country has 4 ports, the airport, railway station, seaport and warehouse. There are some routes connecting different ports. Each route has a specific transportation tool, transportation cost, transit time and weekly schedule. Warehouse in each city allows goods to be deposited for a period of time so as to fit certain transportation schedules or wait for other goods to be transported together. All goods might have different order dates and different delivery deadlines. With all these criteria, how can we find out solution routes for all goods that minimize the overall cost? 
+In our simulated case, there are 8 goods, 4 cities/countries (Shanghai, Wuxi, Singapore, Malaysia), 16 ports and 4 transportation tools. The 8 goods originate from different cities and have different destinations. Each city/country has 4 ports, the airport, railway station, seaport and warehouse. There are in total 50 routes connecting different ports. Each route has a specific transportation tool, transportation cost, transit time and weekly schedule. Warehouse in each city allows goods to be deposited for a period of time so as to fit certain transportation schedules or wait for other goods to be transported together. All goods might have different order dates and different delivery deadlines. With all these criteria, how can we find out solution routes for all goods that minimize the overall cost? 
 
 <p align="center"><img  height="350" src="https://user-images.githubusercontent.com/30411828/45628501-d125b380-bac6-11e8-8bd8-b909ac2a257e.png"></p>
 
@@ -103,7 +103,6 @@ The data of all the above parameter matrices will be imported from **model data.
 With all the variables and parameters defined above, we can build up the objectives and constraints to form an integer programming model.
 ### Objective
 The objective of the model is to minimize the overall cost, which includes 3 parts, **transportation cost**, **warehouse cost** and **tax cost**. Firstly, the **transportation cost** includes container cost and route fixed cost. Container cost equals the number of containers used in each route times per container cost while route fixed cost equals the sum of fixed cost of all used routes. Secondly, the **warehouse cost** equals all goods' sum of volume times days of storage times warehouse fee per cubic meter per day in each warehouse. Finally, the **tax cost** equals the sum of import tariff and transit duty of all goods. Mathematic formulation and Python implementation are attached below.
-
 <p align="center"><img width ="500" src="https://user-images.githubusercontent.com/30411828/45684896-56b66b80-bb7a-11e8-8d6b-0da2d9ec709e.png"></p>
 <p align="center"><img width ="600" src="https://user-images.githubusercontent.com/30411828/45684632-82852180-bb79-11e8-8fd9-547623e9ab66.png"></p>
 
@@ -115,7 +114,31 @@ model.minimize(transportCost + warehouseCost + taxCost)
 ```
 
 ### Constraints
+1. For each goods k, it must be shipped out from its origin to another node and shipped to its destination.
+<p align="left"><img width="550" src="https://user-images.githubusercontent.com/30411828/45704415-6ac59180-bba9-11e8-989a-a02fa615cdf0.png"></p>
 
+```python
+model.add_constraints(np.sum(x[OriginPort[k],:,:,k]) == 1 for k in range(goodsDim))
+model.add_constraints(np.sum(x[:,DestinationPort[k],:,k]) == 1 for k in range(goodsDim))
+```
+
+2. For each goods k, it couldn't be shipped out from its destination or shipped to its origin.
+<p align="left"><img width="550" src="https://user-images.githubusercontent.com/30411828/45704443-7a44da80-bba9-11e8-82c5-1361ccdf1c47.png"></p>
+
+```python
+model.add_constraints(np.sum(x[:,OriginPort[k],:,k]) == 0 for k in range(goodsDim))
+model.add_constraints(np.sum(x[DestinationPort[k],:,:,k]) == 0 for k in range(goodsDim))
+```
+
+3. For each goods k at transition point j (neither origin nor destination), ship-in must equal ship-out. If the goods passes through a port, the ship-in and ship-out both equal 1. Otherwise, ship-in and ship-out both equal 0.
+<p align="left"><img width="550" src="https://user-images.githubusercontent.com/30411828/45704617-f7704f80-bba9-11e8-8162-b9930a2ed4da.png"></p>
+
+```python
+for k in range(goodsDim):
+    for j in range(portDim):
+        if (j != OriginPort[k]) & (j != DestinationPort[k]):
+            model.add_constraint(np.sum(x[:,j,:,k])==np.sum(x[j,:,:,k]))
+```
 
 ## Optimization Result & Solution
 
