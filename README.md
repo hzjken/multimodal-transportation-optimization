@@ -21,7 +21,7 @@ Before model building, some assumptions should be made to simplify the case beca
 7. The minimum unit for time is **day** in the model, and there is **at most one transit in a route in one day**. 
 
 ## Dimension & Matrixing
-In order to make the criteria logic clearer and the calculation more efficient, we use the concept of matrixing to build the necessary components (decision variables, parameters and constraints) in the model. In our case, there are totally 4 dimensions:<br>
+In order to make the criteria logic clearer and the calculation more efficient, we use the concept of matrixing to build the necessary components in the model. In our case, there are totally 4 dimensions:<br>
 1. **Start Port:** &nbsp;&nbsp; ***i***<br>
 Indicating the start port of a direct transport route. The dimension length equals the total number of ports in the data.
 2. **End Port:** &nbsp;&nbsp; ***j***<br>
@@ -59,7 +59,7 @@ A variable matrix used to support the decision variable matrix. It's a 3 dimensi
 Similar to the decision variables, the following parameter arrays or matrices are introduced for the sake of later model building:<br>
 
 1. **Per Container Cost:** &nbsp;&nbsp; ***C***<br>
-A 3 dimensional parameter matrix, each dimension representing start port, end port and time. ***C<sub>i,j,t</sub>*** in the matrix represents the overall transportation cost per container from **port i** to **port j** at **time t**. This overall cost includes handling cost, bunker/fuel cost, documentation cost, equipment cost and extra cost from **model data.xlsx**. For infeasible route, the cost element will be set to be big M (an extremely large number), making the choice infeasible.
+A 3 dimensional parameter matrix, each dimension representing start port, end port and time. ***C<sub>i,j,t</sub>*** in the matrix represents the overall transportation cost per container from **port i** to **port j** at **time t**. This overall cost includes handling cost, bunker/fuel cost, documentation cost, equipment cost and extra cost from [**model data.xlsx**](https://github.com/hzjken/multimodal-transportation-optimization/blob/master/model%20data.xlsx). For infeasible route, the cost element will be set to be big M (an extremely large number), making the choice infeasible.
 
 2. **Route Fixed Cost:** &nbsp;&nbsp; ***FC***<br>
 A 3 dimensional parameter matrix, each dimension representing start port, end port and time. ***FC<sub>i,j,t</sub>*** in the matrix represents the fixed transportation cost to travel from **port i** to **port j** at **time t**, regardless of goods number or volume. For infeasible route, the cost element will be set to be big M as well.
@@ -68,7 +68,7 @@ A 3 dimensional parameter matrix, each dimension representing start port, end po
 A one dimension array with dimension start port. ***wh<sub>i</sub>*** represents the warehouse cost per cubic meter per day at **port i**. Warehouse cost for ports with no warehouse function (like airport, railway station etc.) is set to be big M.
  
 4. **Transportation Time:** &nbsp;&nbsp; ***T***<br>
-A 3 dimensional parameter matrix, each dimension representing start port, end port and time. ***T<sub>i,j,t</sub>*** in the matrix represents the overall transportation time from **port i** to **port j** at **time t**. This overall time includes custom clearance time, handling time, transit time and extra time from **model data.xlsx**. For infeasible route, the time element will be set to be big M.
+A 3 dimensional parameter matrix, each dimension representing start port, end port and time. ***T<sub>i,j,t</sub>*** in the matrix represents the overall transportation time from **port i** to **port j** at **time t**. This overall time includes custom clearance time, handling time, transit time and extra time from [**model data.xlsx**](https://github.com/hzjken/multimodal-transportation-optimization/blob/master/model%20data.xlsx). For infeasible route, the time element will be set to be big M.
 
 5. **Tax Percentage:** &nbsp;&nbsp; ***tax***<br>
 A one dimension array with dimension goods. ***tax<sub>k</sub>*** represents the tax percentage for **goods k** imposed by its destination country. If the goods only goes through a domestic transit, the tax percentage for such goods will be set as 0.
@@ -97,7 +97,7 @@ A one dimension array with dimension goods. ***OP<sub>k</sub>*** represents the 
 13. **Destination Port:** &nbsp;&nbsp; ***DP***<br>
 A one dimension array with dimension goods. ***DP<sub>k</sub>*** represents the port where **goods k** ends up to be in.
 
-The data of all the above parameter matrices will be imported from **model data.xlsx** with function **transform()** and **set_param()**. For more details, please refer to the codes in **multi-modal transpotation.py**.
+The data of all the above parameter matrices will be imported from **model data.xlsx** with function **transform()** and **set_param()**. For more details, please refer to the codes in [**multi-modal transpotation.py**](https://github.com/hzjken/multimodal-transportation-optimization/blob/master/multi-modal%20transpotation.py).
 
 ## Mathematical Modelling
 
