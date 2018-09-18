@@ -5,7 +5,8 @@ In delivery services, many different transportation tools such as trucks, airpla
 
 <p align="center"><img src="https://user-images.githubusercontent.com/30411828/45585955-c6311e80-b920-11e8-95c9-bc90089446b4.jpg"></p>
 
-In our simulated case, there are 8 goods, 4 cities/countries (Shanghai, Wuxi, Singapore, Malaysia), 16 ports and 4 transportation tools. The 8 goods originate from different cities and have different destinations. Each city/country has 4 ports, the airport, railway station, seaport and warehouse. There are some routes connecting different ports. Each route has a specific transportation tool, transportation cost, transit time and weekly schedule. Warehouse in each city allows goods to be deposited for a period of time so as to fit certain transportation schedules or wait for other goods to be transported together. Some more criteria about the case will be given in later parts.
+## Problem Statement
+In our simulated case, there are 8 goods, 4 cities/countries (Shanghai, Wuxi, Singapore, Malaysia), 16 ports and 4 transportation tools. The 8 goods originate from different cities and have different destinations. Each city/country has 4 ports, the airport, railway station, seaport and warehouse. There are some routes connecting different ports. Each route has a specific transportation tool, transportation cost, transit time and weekly schedule. Warehouse in each city allows goods to be deposited for a period of time so as to fit certain transportation schedules or wait for other goods to be transported together. All goods might have different order dates and different delivery deadlines. With all these criteria, how can we find out solution routes for all goods that minimize the overall cost? 
 
 <p align="center"><img  height="350" src="https://user-images.githubusercontent.com/30411828/45628501-d125b380-bac6-11e8-8bd8-b909ac2a257e.png"></p>
 
@@ -52,9 +53,36 @@ A 3 dimensional parameter matrix, each dimension representing start port, end po
 
 3. **Warehouse Cost:** &nbsp;&nbsp; ***wh***<br>
 A one dimension array with length equaling the total number of ports. ***wh<sub>i</sub>*** represents the warehouse cost per cubic meter per day at **port i**. Warehouse cost for ports with no warehouse function (like airport, railway station etc.) is set to be big M.
-
+ 
 4. **Transportation Time:** &nbsp;&nbsp; ***T***<br>
 A 3 dimensional parameter matrix, each dimension representing start port, end port and time. ***T<sub>i,j,t</sub>*** in the matrix represents the overall transportation time from **port i** to **port j** at **time t**. This overall time includes custom clearance time, handling time, transit time and extra time from **model data.xlsx**. For infeasible route, the time element will be set to be big M.
+
+5. **Tax Percentage:** &nbsp;&nbsp; ***tax***<br>
+A one dimension array with length euqaling the total number of goods. ***tax<sub>k</sub>*** represents the tax percentage for **goods k** imposed by its destination country. If the goods only goes through a domestic transit, the tax percentage for such goods will be set as 0.
+
+6. **Transit Duty:** &nbsp;&nbsp; ***td***<br>
+A two dimensional matrix, each dimension representing start port and end port. ***td<sub>i,j</sub>*** represents the transit duty percentage for goods to go from **port i** to **port j**. If port i and port j belong to the same country, transit duty percentage is set to be 0. For simplicity purpose, transit duty is set to be equal among all goods. (can be extended easily) 
+
+7. **Container Volume:** &nbsp;&nbsp; ***ctnV***<br>
+A two dimensional matrix, each dimension representing start port and end port. ***ctnV<sub>i,j</sub>*** represents the volume of container in the route from **port i** to **port j**.
+
+8. **Goods Volume:** &nbsp;&nbsp; ***V***<br>
+A one dimension array with length equaling the total number of goods. ***V<sub>k</sub>*** represents the volume of **goods k**.
+
+9. **Goods Value:** &nbsp;&nbsp; ***val***<br>
+A one dimension array with length equaling the total number of goods. ***val<sub>k</sub>*** represents the value of **goods k**.
+
+10. **Order Date:** &nbsp;&nbsp; ***ord***<br>
+A one dimension array with length equaling the total number of goods. ***ord<sub>k</sub>*** represents the order date of **goods k**.
+
+11. **Deadline Date:** &nbsp;&nbsp; ***ddl***<br>
+A one dimension array with length equaling the total number of goods. ***ddl<sub>k</sub>*** represents the deadline delivery date of **goods k**.
+
+12. **Origin Port:** &nbsp;&nbsp; ***OP***<br>
+A one dimension array with length equaling the total number of goods. ***OP<sub>k</sub>*** represents the port where **goods k** starts from.
+
+13. **Destination Port:** &nbsp;&nbsp; ***DP***<br>
+A one dimension array with length equaling the total number of goods. ***DP<sub>k</sub>*** represents the port where **goods k** ends up to be in.
 
 ## Mathematical Modelling
 
