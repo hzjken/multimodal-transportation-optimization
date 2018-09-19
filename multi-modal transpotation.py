@@ -134,35 +134,32 @@ class MMT(Model):
         taxCost = np.sum(self.taxPct*self.kValue) + transitDutyCost
         self.minimize(transportCost + warehouseCost + taxCost)
         ###constraint###
-        #1.constraint for start & end
+        #1.Goods must be shipped out from its origin to another node and shipped to its destination.
         self.add_constraints(np.sum(self.x[self.kStartPort[k],:,:,k]) == 1 for k in range(self.goods))
         self.add_constraints(np.sum(self.x[:,self.kEndPort[k],:,k]) == 1 for k in range(self.goods))
+        #2.For each goods k, it couldn't be shipped out from its destination or shipped to its origin.
         self.add_constraints(np.sum(self.x[:,self.kStartPort[k],:,k]) == 0 for k in range(self.goods))
         self.add_constraints(np.sum(self.x[self.kEndPort[k],:,:,k]) == 0 for k in range(self.goods))
-        #2.constraint for transition point
+        #3.constraint for transition point
         for k in range(self.goods):
             for j in range(self.portSpace):
                 if (j != self.kStartPort[k]) & (j != self.kEndPort[k]):
                     self.add_constraint(np.sum(self.x[:,j,:,k])==np.sum(self.x[j,:,:,k]))
-        #3.each goods can only be transitioned in or out of a port for at most once
+        #4.each goods can only be transitioned in or out of a port for at most once
         self.add_constraints(np.sum(self.x[i,:,:,k]) <= 1 for k in range(self.goods) for i in range(self.portSpace))
         self.add_constraints(np.sum(self.x[:,j,:,k]) <= 1 for k in range(self.goods) for j in range(self.portSpace))
-        #4.transition-out should be after transition-in
+        #5.transition-out should be after transition-in
         self.add_constraints(stayTime[j,k] >= 0 for j in range(self.portSpace) for k in range(self.goods))
-        #5.constraint for number of containers used
+        #6.constraint for number of containers used
         numCtn = np.dot(self.x,self.kVol)/self.ctnVol
         self.add_constraints(self.y[i,j,t] - numCtn[i,j,t] >= 0 \
         for i in range(self.portSpace) for j in range(self.portSpace) for t in range(self.dateSpace))
-        #6. constraint to check whether a route is used
-        self.add_constraints(self.z[i,j,t] >= (np.sum(self.x[i,j,t,:])/self.goods) \
+        #7. constraint to check whether a route is used
+        self.add_constraints(self.z[i,j,t] >= (np.sum(self.x[i,j,t,:])*10e-5) \
         for i in range(self.portSpace) for j in range(self.portSpace) for t in range(self.dateSpace))
-        #7.time limitation constraint for each goods
+        #8.time limitation constraint for each goods
         self.add_constraints(np.sum(arrTime[:,self.kEndPort[k],:,k]) <= self.kDDL[k] for k in range(self.goods))
-        #8.start time limitation constraint for each goods
-        for k in range(self.goods):
-            if self.kStartTime[k] > 0:
-                self.add_constraint(np.sum(self.x[self.kStartPort[k],:,0:self.kStartTime[k],k]) == 0)
-        
+     
     
     def solve_model(self):
         '''solve the optimization model & cache the optimized objective value, 
