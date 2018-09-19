@@ -131,7 +131,7 @@ model.add_constraints(np.sum(x[:,OriginPort[k],:,k]) == 0 for k in range(goodsDi
 model.add_constraints(np.sum(x[DestinationPort[k],:,:,k]) == 0 for k in range(goodsDim))
 ```
 
-3. For each goods k at transition point j (neither origin nor destination), ship-in must equal ship-out. If the goods passes through a port, the ship-in and ship-out both equal 1. Otherwise, ship-in and ship-out both equal 0.
+3. For each goods k at transition point j (neither origin nor destination), ship-in times must equal ship-out times.
 <p align="left"><img width="550" src="https://user-images.githubusercontent.com/30411828/45704617-f7704f80-bba9-11e8-8162-b9930a2ed4da.png"></p>
 
 ```python
@@ -139,6 +139,43 @@ for k in range(goodsDim):
     for j in range(portDim):
         if (j != OriginPort[k]) & (j != DestinationPort[k]):
             model.add_constraint(np.sum(x[:,j,:,k])==np.sum(x[j,:,:,k]))
+```
+
+4. Each goods k can only be transitioned in or out of a port for at most once.
+<p align="left"><img width="550" src="https://user-images.githubusercontent.com/30411828/45728788-29120680-bbfc-11e8-8b1a-780eba4b6a3f.png"></p>
+
+```python
+model.add_constraints(np.sum(x[i,:,:,k]) <= 1 for k in range(goodsDim) for i in range(portDim))
+model.add_constraints(np.sum(x[:,j,:,k]) <= 1 for k in range(goodsDim) for j in range(portDim))
+```
+
+5. For each goods k at transition point j, ship-out time should be after ship-in time.
+<p align="left"><img width="550" src="https://user-images.githubusercontent.com/30411828/45731532-a6dd0e80-bc0a-11e8-8a0f-acefa8ec4f0c.png"></p>
+
+```python
+startTime = np.arange(timeDim).reshape(1,1,timeDim,1)*x            
+arrTime = startTime + tranTime.reshape(portDim,portDim,timeDim,1)*x
+stayTime = np.sum(startTime,axis=(1,2)) - np.sum(arrTime,axis=(0,2))
+stayTime[OriginPort,range(goodsDim)] -= OrderDate #ship-out time at origin port should be after order date
+stayTime[DestinationPort,range(goodsDim)] = 0 #stay time at destination port is not considered
+model.add_constraints(stayTime[i,k] >= 0 for i in range(portDim) for k in range(goodsDim))
+```
+
+6. At each route at time t, the total volume of containers should be larger than the total volume of goods.
+<p align="left"><img width="550" src="https://user-images.githubusercontent.com/30411828/45731416-19012380-bc0a-11e8-984d-4ecfd6272e66.png"></p>
+
+```python
+numCtn = np.dot(x,kVol) / ctnVol.reshape(portDim,portDim,1)
+model.add_constraints(y[i,j,t] - numCtn[i,j,t] >= 0 \
+for i in range(portDim) for j in range(portDim) for t in range(dateDim))
+```
+
+7. Check whether a route is used at time t. Because ***Z<sub>i,j,t</sub>*** is binary variable, if a route is used, sum of ***X<sub>i,j,t,k</sub>*** for all goods k at **i,j,t** must be greater than 0. We can scale it back to [0,1] by multiplying a small number.
+<p align="left"><img width="550" src="https://user-images.githubusercontent.com/30411828/45732047-223fbf80-bc0d-11e8-8216-8bc0e72d852d.png"></p>
+
+```python
+model.add_constraints(z[i,j,t] >= np.sum(x[i,j,t,:])*10e-5 \
+for i in range(portDim) for j in range(portDim) for t in range(timeDim))
 ```
 
 ## Optimization Result & Solution
