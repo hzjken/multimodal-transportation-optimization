@@ -149,8 +149,8 @@ model.add_constraints(np.sum(x[i,:,:,k]) <= 1 for k in range(goodsDim) for i in 
 model.add_constraints(np.sum(x[:,j,:,k]) <= 1 for k in range(goodsDim) for j in range(portDim))
 ```
 
-5. For each goods k at transition point j, ship-out time should be after ship-in time.
-<p align="left"><img width="550" src="https://user-images.githubusercontent.com/30411828/45731532-a6dd0e80-bc0a-11e8-8a0f-acefa8ec4f0c.png"></p>
+5. For each goods k at transition port j, ship-out time should be after ship-in time. For goods k at its origin port, ship-out time should be after order date. (Or stay time greater than order date, because ship-in time is none)
+<p align="left"><img width="550" src="https://user-images.githubusercontent.com/30411828/45734505-65069500-bc17-11e8-92d9-dc38c652e8a6.png"></p>
 
 ```python
 startTime = np.arange(timeDim).reshape(1,1,timeDim,1)*x            
@@ -176,6 +176,14 @@ for i in range(portDim) for j in range(portDim) for t in range(dateDim))
 ```python
 model.add_constraints(z[i,j,t] >= np.sum(x[i,j,t,:])*10e-5 \
 for i in range(portDim) for j in range(portDim) for t in range(timeDim))
+```
+
+8. For each goods k, it should be shipped to its destination port before the deadline delivery date.
+<p align="left"><img width="550" src="https://user-images.githubusercontent.com/30411828/45732937-27067280-bc11-11e8-9654-8f2b1fa5e2ce.png"></p>
+
+```python
+arrTime = np.arange(timeDim).reshape(1,1,timeDim,1)*x + tranTime.reshape(portDim,portDim,timeDim,1)*x
+model.add_constraints(np.sum(arrTime[:,DestinationPort[k],:,k]) <= kDDL[k] for k in range(goodsDim))
 ```
 
 ## Optimization Result & Solution
