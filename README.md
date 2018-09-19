@@ -1,15 +1,15 @@
 # Multi-modal Transportation Optimization
 A project on using mathematical programming to solve multi-modal transportation cost minimization in goods delivery and supply chain management.
 ## Catalogue
-&nbsp;&nbsp;&nbsp;&nbsp;[**Project Overview**](https://github.com/hzjken/multimodal-transportation-optimization/#project-overview)<br>
-&nbsp;&nbsp;&nbsp;&nbsp;[**Problem Statement**](https://github.com/hzjken/multimodal-transportation-optimization/#problem-statement)<br>
-&nbsp;&nbsp;&nbsp;&nbsp;[**Assumptions**](https://github.com/hzjken/multimodal-transportation-optimization/#assumptions)<br>
-&nbsp;&nbsp;&nbsp;&nbsp;[**Dimension & Matrixing**](https://github.com/hzjken/multimodal-transportation-optimization/#dimension--matrixing)<br>
-&nbsp;&nbsp;&nbsp;&nbsp;[**Decision Variables**](https://github.com/hzjken/multimodal-transportation-optimization/#decision-variables)<br>
-&nbsp;&nbsp;&nbsp;&nbsp;[**Parameters**](https://github.com/hzjken/multimodal-transportation-optimization/#parameters)<br>
-&nbsp;&nbsp;&nbsp;&nbsp;[**Mathematical Modelling**](https://github.com/hzjken/multimodal-transportation-optimization/#mathematical-modelling)<br>
-&nbsp;&nbsp;&nbsp;&nbsp;[**Optimization Result & Solution**](https://github.com/hzjken/multimodal-transportation-optimization/#optimization-result--solution)<br>
-&nbsp;&nbsp;&nbsp;&nbsp;[**Model Use & Extension Guide**](https://github.com/hzjken/multimodal-transportation-optimization/#model-use--extension-guide)
+[**Project Overview**](https://github.com/hzjken/multimodal-transportation-optimization/#project-overview)<br>
+[**Problem Statement**](https://github.com/hzjken/multimodal-transportation-optimization/#problem-statement)<br>
+[**Assumptions**](https://github.com/hzjken/multimodal-transportation-optimization/#assumptions)<br>
+[**Dimension & Matrixing**](https://github.com/hzjken/multimodal-transportation-optimization/#dimension--matrixing)<br>
+[**Decision Variables**](https://github.com/hzjken/multimodal-transportation-optimization/#decision-variables)<br>
+[**Parameters**](https://github.com/hzjken/multimodal-transportation-optimization/#parameters)<br>
+[**Mathematical Modelling**](https://github.com/hzjken/multimodal-transportation-optimization/#mathematical-modelling)<br>
+[**Optimization Result & Solution**](https://github.com/hzjken/multimodal-transportation-optimization/#optimization-result--solution)<br>
+[**Model Use & Extension Guide**](https://github.com/hzjken/multimodal-transportation-optimization/#model-use--extension-guide)
 
 ## Project Overview
 In delivery services, many different transportation tools such as trucks, airplanes and ships are available. Different choices of routes and transporation tools will lead to different costs. To minimize cost, we should consider goods consolidation (Occassions when different goods share a journey together.), different transportation costs and delivery time constraints etc. This project uses mathematical programming to model such situation and solves for overall cost minimization solution. The model is implemented with **IBM Cplex API** and **numpy** matrixing in Python.
@@ -201,3 +201,8 @@ model.add_constraints(np.sum(arrTime[:,DestinationPort[k],:,k]) <= kDDL[k] for k
 With the objective & constraints built, the model is now complete! To make users understand the result easier, we process it with the function **txt_solution()** and save it into a text file [**Solution.txt**](https://github.com/hzjken/multimodal-transportation-optimization/blob/master/Solution.txt). The minimized cost value as well as optimal routes for all goods are presented in it. 
 
 ## Model Use & Extension Guide
+Now that you know about all the details of the model, if you want to use it, just download the [**multi-modal transpotation.py**](https://github.com/hzjken/multimodal-transportation-optimization/blob/master/multi-modal%20transpotation.py) & [**model data.xlsx**](https://github.com/hzjken/multimodal-transportation-optimization/blob/master/model%20data.xlsx) in this repo. You can reset all the parameters' data in the excel file to fit your own case. After that, just run the python file and your **Solution.txt** will be generated!
+
+The code is written in OOP format, so you can easily modify or extend the **class MMT** to fit cases of more complex situations. You can also try modifying the assumptions such as making it to be a stochastic optimization problem or so on.
+
+Finally, hope this long documentation helps, and thanks all my MSBA teammates (**Derek, Teng Lei, Max, Veronica, Sophia**) for the help and contributions in this project!
