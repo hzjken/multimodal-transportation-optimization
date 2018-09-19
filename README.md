@@ -1,5 +1,16 @@
 # Multi-modal Transportation Optimization
 A project on using mathematical programming to solve multi-modal transportation cost minimization in goods delivery and supply chain management.
+## Catalogue
+&nbsp;&nbsp;&nbsp;&nbsp;[**Project Overview**](https://github.com/hzjken/multimodal-transportation-optimization/#project-overview)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;[**Problem Statement**](https://github.com/hzjken/multimodal-transportation-optimization/#problem-statement)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;[**Assumptions**](https://github.com/hzjken/multimodal-transportation-optimization/#assumptions)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;[**Dimension & Matrixing**](https://github.com/hzjken/multimodal-transportation-optimization/#dimension--matrixing)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;[**Decision Variables**](https://github.com/hzjken/multimodal-transportation-optimization/#decision-variables)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;[**Parameters**](https://github.com/hzjken/multimodal-transportation-optimization/#parameters)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;[**Mathematical Modelling**](https://github.com/hzjken/multimodal-transportation-optimization/#mathematical-modelling)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;[**Optimization Result & Solution**](https://github.com/hzjken/multimodal-transportation-optimization/#optimization-result--solution)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;[**Model Use & Extension Guide**](https://github.com/hzjken/multimodal-transportation-optimization/#model-use--extension-guide)
+
 ## Project Overview
 In delivery services, many different transportation tools such as trucks, airplanes and ships are available. Different choices of routes and transporation tools will lead to different costs. To minimize cost, we should consider goods consolidation (Occassions when different goods share a journey together.), different transportation costs and delivery time constraints etc. This project uses mathematical programming to model such situation and solves for overall cost minimization solution. The model is implemented with **IBM Cplex API** and **numpy** matrixing in Python.
 
@@ -187,5 +198,6 @@ model.add_constraints(np.sum(arrTime[:,DestinationPort[k],:,k]) <= kDDL[k] for k
 ```
 
 ## Optimization Result & Solution
+With the objective & constraints built, the model is now complete! To make users understand the result easier, we process it with the function **txt_solution()** and save it into a text file [**Solution.txt**](https://github.com/hzjken/multimodal-transportation-optimization/blob/master/Solution.txt). The minimized cost value as well as optimal routes for all goods are presented in it. 
 
 ## Model Use & Extension Guide
