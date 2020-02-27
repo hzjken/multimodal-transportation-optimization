@@ -323,9 +323,9 @@ class MMT:
         arrTimeMtrx = startTime + self.tranTime.reshape(self.portSpace, \
                                                         self.portSpace, self.dateSpace, 1) * x
         arrTime = arrTimeMtrx.copy()
-        arrTimeMtrx[:, self.kEndPort, :, range(self.goods)] = 0
+        arrTimeMtrx[:, self.kEndPort.tolist(), :, range(self.goods)] = 0
         stayTime = np.sum(startTime, axis=(1, 2)) - np.sum(arrTimeMtrx, axis=(0, 2))
-        stayTime[self.kStartPort, range(self.goods)] -= self.kStartTime
+        stayTime[self.kStartPort.tolist(), range(self.goods)] -= self.kStartTime
         warehouseCost = np.sum(np.sum(stayTime * self.kVol, axis=1) * self.whCost)
 
         return warehouseCost, arrTime, stayTime
@@ -365,9 +365,8 @@ class MMT:
 def transform(filePath):
     '''Read in order and route data, transform the data into a form that can
     be processed by the operation research model.'''
-
-    order = pd.read_excel(filePath, sheetname='Order Information')
-    route = pd.read_excel(filePath, sheetname='Route Information')
+    order = pd.read_excel(filePath, sheet_name='Order Information')
+    route = pd.read_excel(filePath, sheet_name='Route Information')
     order['Tax Percentage'][order['Journey Type'] == 'Domestic'] = 0
     route['Cost'] = route[route.columns[7:12]].sum(axis=1)
     route['Time'] = np.ceil(route[route.columns[14:18]].sum(axis=1) / 24)
